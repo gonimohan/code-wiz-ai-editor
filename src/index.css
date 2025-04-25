@@ -1,101 +1,315 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
-
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
-
-    --radius: 0.5rem;
-
-    --sidebar-background: 0 0% 98%;
-
-    --sidebar-foreground: 240 5.3% 26.1%;
-
-    --sidebar-primary: 240 5.9% 10%;
-
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
-  }
-
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
-  }
+:root {
+  --editor-bg: #1e1e1e;
+  --sidebar-bg: #252526;
+  --header-bg: #333333;
+  --active-tab: #0e639c;
+  --hover-bg: #2a2a2a;
+  --selected-item: #37373d;
+  --text-primary: #d4d4d4;
+  --text-secondary: #858585;
+  --text-muted: #6b6b6b;
 }
 
-@layer base {
-  * {
-    @apply border-border;
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+  background-color: var(--editor-bg);
+  color: var(--text-primary);
+  height: 100vh;
+  overflow: hidden;
+}
+
+@layer components {
+  .app-container {
+    @apply flex flex-col h-screen;
   }
 
-  body {
-    @apply bg-background text-foreground;
+  /* Top bar */
+  .top-bar {
+    @apply flex justify-between items-center bg-[#252526] px-4 h-12 border-b border-black;
+  }
+
+  .logo {
+    @apply font-bold text-white flex items-center gap-2;
+  }
+
+  .logo-icon {
+    @apply text-blue-400;
+  }
+
+  .actions {
+    @apply flex;
+  }
+
+  .action-btn {
+    @apply flex items-center bg-[#333] border-none text-[#d4d4d4] py-1.5 px-3 ml-2 rounded cursor-pointer text-xs transition-colors;
+  }
+
+  .action-btn:hover {
+    @apply bg-[#444];
+  }
+
+  .action-btn svg {
+    @apply mr-1;
+  }
+
+  /* Main content area */
+  .main-content {
+    @apply flex flex-1 overflow-hidden;
+  }
+
+  /* Sidebar */
+  .sidebar {
+    @apply w-60 bg-[#252526] border-r border-black overflow-y-auto;
+  }
+
+  .explorer-header {
+    @apply p-2 text-xs text-[#6b6b6b] uppercase tracking-wider flex justify-between items-center;
+  }
+
+  .file-tree {
+    @apply text-sm;
+  }
+
+  .file-tree-item {
+    @apply cursor-pointer;
+  }
+
+  .directory-header {
+    @apply flex items-center py-1 px-2 rounded transition-colors;
+  }
+
+  .directory-header:hover {
+    @apply bg-[#2a2a2a];
+  }
+
+  .directory-header.expanded {
+    @apply font-medium;
+  }
+
+  .directory-children {
+    @apply ml-4;
+  }
+
+  .file-item {
+    @apply flex items-center py-1 px-2 rounded transition-colors;
+  }
+
+  .file-item:hover {
+    @apply bg-[#2a2a2a];
+  }
+
+  .file-item.selected {
+    @apply bg-[#37373d];
+  }
+
+  .file-icon {
+    @apply mr-1.5 text-xs;
+  }
+
+  /* Editor area */
+  .editor-area {
+    @apply flex-1 flex flex-col overflow-hidden;
+  }
+
+  .editor-header {
+    @apply flex justify-between items-center px-4 h-9 bg-[#252526] border-b border-black;
+  }
+
+  .view-tabs {
+    @apply flex;
+  }
+
+  .tab {
+    @apply flex items-center border-none text-[#858585] py-2 px-3 cursor-pointer text-xs bg-transparent transition-all relative;
+  }
+
+  .tab.active {
+    @apply text-white;
+  }
+
+  .tab.active::after {
+    content: '';
+    @apply absolute bottom-0 left-0 w-full h-0.5 bg-[#0e639c];
+  }
+
+  .tab:hover {
+    @apply text-white;
+  }
+
+  .path-display {
+    @apply text-xs text-[#858585];
+  }
+
+  .code-editor {
+    @apply flex flex-1 overflow-hidden relative;
+  }
+
+  .line-numbers {
+    @apply py-3 px-2 bg-[#1e1e1e] text-[#6b6b6b] text-right select-none text-xs overflow-y-hidden w-12 border-r border-[#333];
+  }
+
+  .line-number {
+    @apply py-px px-2;
+  }
+
+  .code-input {
+    @apply flex-1 py-3 px-4 bg-[#1e1e1e] text-[#d4d4d4] border-none font-mono text-xs resize-none outline-none whitespace-pre overflow-auto;
+  }
+
+  .syntax-highlighted {
+    @apply absolute top-0 left-0 py-3 px-4 pointer-events-none font-mono text-xs whitespace-pre overflow-visible;
+    margin-left: 48px; /* Width of line numbers */
+  }
+
+  .syntax-token-keyword {
+    @apply text-[#569cd6];
+  }
+
+  .syntax-token-string {
+    @apply text-[#ce9178];
+  }
+
+  .syntax-token-comment {
+    @apply text-[#6a9955];
+  }
+
+  .syntax-token-function {
+    @apply text-[#dcdcaa];
+  }
+
+  .syntax-token-variable {
+    @apply text-[#9cdcfe];
+  }
+
+  .preview-pane {
+    @apply flex-1 bg-[#1e1e1e] overflow-auto p-4;
+  }
+
+  .html-preview {
+    @apply w-full h-full border-none bg-white rounded shadow-lg;
+  }
+
+  .preview-message {
+    @apply flex justify-center items-center h-full text-[#858585];
+  }
+
+  .no-file-selected {
+    @apply flex justify-center items-center h-full text-[#858585] flex-col gap-4;
+  }
+
+  /* AI Suggestion Panel */
+  .ai-suggestion-panel {
+    @apply bg-[#252526] border-t border-black max-h-60 overflow-y-auto;
+  }
+
+  .ai-header {
+    @apply flex items-center p-3 bg-[#333] text-xs justify-between;
+  }
+
+  .thinking-indicator {
+    @apply ml-2 text-[#858585] italic;
+  }
+
+  .suggestion-content {
+    @apply p-3 text-xs;
+  }
+
+  .suggestion-content pre {
+    @apply m-0 p-2 bg-[#1e1e1e] rounded overflow-x-auto;
+  }
+
+  .accept-btn {
+    @apply mt-2 bg-[#0e639c] text-white border-none py-1.5 px-3 rounded cursor-pointer text-xs transition-colors;
+  }
+
+  .accept-btn:hover {
+    @apply bg-[#1177bb];
+  }
+
+  /* Terminal area */
+  .terminal-area {
+    @apply h-48 bg-[#1e1e1e] border-t border-black overflow-hidden flex flex-col;
+  }
+
+  .terminal-header {
+    @apply flex items-center justify-between p-2 bg-[#252526] text-xs;
+  }
+
+  .terminal-actions {
+    @apply flex gap-2;
+  }
+
+  .terminal-btn {
+    @apply text-xs bg-transparent border border-transparent rounded p-1 text-gray-400 hover:text-white transition-colors;
+  }
+
+  .terminal-content {
+    @apply flex-1 p-2 text-xs overflow-y-auto;
+  }
+
+  .terminal-line {
+    @apply mb-1 whitespace-pre-wrap break-all;
+  }
+
+  .terminal-input-line {
+    @apply flex items-center mt-2;
+  }
+
+  .terminal-input-line span {
+    @apply mr-2 text-[#0e639c];
+  }
+
+  .terminal-input {
+    @apply flex-1 bg-transparent border-none text-[#d4d4d4] font-mono text-xs outline-none;
+  }
+
+  /* File type icons */
+  .file-icon-tsx, .file-icon-jsx {
+    @apply text-blue-400;
+  }
+
+  .file-icon-css {
+    @apply text-pink-400;
+  }
+
+  .file-icon-html {
+    @apply text-orange-400;
+  }
+
+  .file-icon-json {
+    @apply text-yellow-400;
+  }
+
+  .file-icon-js, .file-icon-ts {
+    @apply text-yellow-300;
+  }
+
+  /* Status bar */
+  .status-bar {
+    @apply flex justify-between items-center h-6 bg-[#007acc] text-white px-4 text-xs;
+  }
+
+  .status-item {
+    @apply flex items-center gap-1;
+  }
+
+  /* Breadcrumb */
+  .breadcrumb {
+    @apply flex items-center text-xs text-[#858585] mb-1;
+  }
+
+  .breadcrumb-item {
+    @apply hover:text-white cursor-pointer;
+  }
+
+  .breadcrumb-separator {
+    @apply mx-1;
   }
 }

@@ -258,6 +258,10 @@ const Index = () => {
     }
   };
 
+  const clearSuggestion = () => {
+    setAiSuggestion('');
+  };
+
   const saveFile = () => {
     if (selectedFile) {
       updateFileContent(selectedFile.id, editorContent);
@@ -702,6 +706,7 @@ const Index = () => {
             onEditorChange={handleEditorChange}
             onViewModeChange={setViewMode}
             onAcceptSuggestion={acceptSuggestion}
+            onClearSuggestion={clearSuggestion}
           />
         </div>
 

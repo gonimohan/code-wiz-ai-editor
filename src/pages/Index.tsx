@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Search, Code, Play, Save, Zap, GitBranch, Terminal as TerminalIcon } from 'lucide-react';
+import { Search, Code, Play, Save, Zap, GitBranch, Terminal as TerminalIcon, FileText, ChevronDown, ChevronRight, Folder, X, CheckSquare } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import { FileExplorer } from '@/components/FileExplorer/FileExplorer';
 import { CodeEditor } from '@/components/Editor/CodeEditor';
@@ -33,6 +33,7 @@ const Index = () => {
   const terminalRef = useRef<HTMLDivElement>(null);
   const sidebarRef = useRef<HTMLDivElement>(null);
   const editorRef = useRef<HTMLTextAreaElement>(null);
+  const { toast } = useToast();
 
   useEffect(() => {
     const initialFs: FileNode[] = [

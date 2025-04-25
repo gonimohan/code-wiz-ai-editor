@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { MessageCircle } from 'lucide-react';
+import { MessageCircle, X } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 
 interface Message {

@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Code, Play, Zap } from 'lucide-react';
+import { Code, Play, Zap, X, CheckSquare } from 'lucide-react';
 import { FileNode } from '../FileExplorer/types';
 
 interface CodeEditorProps {
@@ -111,11 +111,19 @@ export const CodeEditor = ({
               <span>AI Assistant</span>
               {aiThinking && <span className="thinking-indicator">thinking...</span>}
             </div>
+            <button 
+              onClick={() => setAiSuggestion('')}
+              className="text-xs hover:text-white"
+              title="Clear suggestion"
+            >
+              <X size={14} />
+            </button>
           </div>
           {aiSuggestion && (
             <div className="suggestion-content">
               <pre>{aiSuggestion}</pre>
               <button onClick={onAcceptSuggestion} className="accept-btn">
+                <CheckSquare size={14} className="mr-1" /> 
                 Accept Suggestion
               </button>
             </div>

@@ -1,7 +1,7 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { MessageCircle, X } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
+import { APIKeyManager } from './APIKeyManager';
 
 interface Message {
   id: string;
@@ -16,7 +16,13 @@ export const Chat = () => {
   const [isThinking, setIsThinking] = useState(false);
   const { toast } = useToast();
   
-  const handleSendMessage = (e: React.FormEvent) => {
+  const getAvailableProviders = () => {
+    const savedKeys = localStorage.getItem('api_keys');
+    if (!savedKeys) return [];
+    return JSON.parse(savedKeys).map((key: any) => key.provider);
+  };
+
+  const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim()) return;
     
@@ -30,12 +36,22 @@ export const Chat = () => {
     setMessages(prev => [...prev, newMessage]);
     setInput('');
     setIsThinking(true);
+
+    const providers = getAvailableProviders();
     
-    // Simulate AI response
+    if (providers.length === 0) {
+      toast({
+        title: "No API Keys Found",
+        description: "Please add at least one API key to use the chat functionality",
+      });
+      setIsThinking(false);
+      return;
+    }
+    
     setTimeout(() => {
       const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
-        content: "Based on your input, I'll help create a professional solution. Let me know if you need any clarification.",
+        content: `Using ${providers[0]} API. Based on your input, I'll help create a professional solution. Let me know if you need any clarification.`,
         isUser: false,
         timestamp: new Date()
       };
@@ -52,9 +68,12 @@ export const Chat = () => {
   
   return (
     <div className="flex flex-col bg-[#252526] border-l border-black h-full">
-      <div className="flex items-center p-4 border-b border-black bg-[#333333]">
-        <MessageCircle className="w-5 h-5 mr-2 text-[#858585]" />
-        <span className="text-sm font-medium text-[#d4d4d4]">AI Assistant</span>
+      <div className="flex items-center justify-between p-4 border-b border-black bg-[#333333]">
+        <div className="flex items-center">
+          <MessageCircle className="w-5 h-5 mr-2 text-[#858585]" />
+          <span className="text-sm font-medium text-[#d4d4d4]">AI Assistant</span>
+        </div>
+        <APIKeyManager />
       </div>
       
       <div className="flex-1 overflow-y-auto p-4 space-y-4">

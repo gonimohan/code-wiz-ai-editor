@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Code, Play, Zap, X, CheckSquare } from 'lucide-react';
 import { FileNode } from '../FileExplorer/types';
@@ -13,6 +12,7 @@ interface CodeEditorProps {
   onEditorChange: (content: string) => void;
   onViewModeChange: (mode: 'code' | 'preview') => void;
   onAcceptSuggestion: () => void;
+  onClearSuggestion: () => void;
 }
 
 export const CodeEditor = ({
@@ -24,7 +24,8 @@ export const CodeEditor = ({
   aiSuggestion,
   onEditorChange,
   onViewModeChange,
-  onAcceptSuggestion
+  onAcceptSuggestion,
+  onClearSuggestion
 }: CodeEditorProps) => {
   if (!selectedFile) {
     return (
@@ -112,7 +113,7 @@ export const CodeEditor = ({
               {aiThinking && <span className="thinking-indicator">thinking...</span>}
             </div>
             <button 
-              onClick={() => setAiSuggestion('')}
+              onClick={onClearSuggestion}
               className="text-xs hover:text-white"
               title="Clear suggestion"
             >

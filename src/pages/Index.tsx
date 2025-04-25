@@ -1,22 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
+import { Search, Code, Play, Save, Zap, GitBranch, Terminal as TerminalIcon } from 'lucide-react';
+import { useToast } from "@/hooks/use-toast";
+import { FileExplorer } from '@/components/FileExplorer/FileExplorer';
+import { CodeEditor } from '@/components/Editor/CodeEditor';
+import { Terminal } from '@/components/Terminal/Terminal';
 import { Chat } from '@/components/Chat';
-import { 
-  ChevronDown, ChevronRight, Terminal, Code, 
-  Play, Save, Zap, X, Maximize2, 
-  MinusSquare, CheckSquare, Coffee, RefreshCw,
-  FileText, Folder, FolderPlus, FilePlus, Settings,
-  Search, GitBranch
-} from 'lucide-react';
-import { toast } from "@/hooks/use-toast";
-
-interface FileNode {
-  id: string;
-  name: string;
-  type: 'file' | 'directory';
-  content?: string;
-  children?: FileNode[];
-  language?: string;
-}
+import type { FileNode } from '@/components/FileExplorer/types';
 
 const Index = () => {
   const [fileSystem, setFileSystem] = useState<FileNode[]>([]);
@@ -685,62 +674,36 @@ const Index = () => {
       )}
       
       <div className="main-content">
-        <div className="sidebar">
-          <div className="explorer-header">
-            <span>EXPLORER</span>
-            <div className="flex space-x-2">
-              <button 
-                className="text-[#858585] hover:text-white"
-                onClick={createNewFile}
-                title="New File"
-              >
-                <FilePlus size={14} />
-              </button>
-              <button 
-                className="text-[#858585] hover:text-white"
-                onClick={createNewFolder}
-                title="New Folder"
-              >
-                <FolderPlus size={14} />
-              </button>
-              <button 
-                className="text-[#858585] hover:text-white"
-                title="Refresh Explorer"
-              >
-                <RefreshCw size={14} />
-              </button>
-            </div>
-          </div>
-          <div className="file-tree">
-            {renderFileTree(fileSystem)}
-          </div>
-        </div>
-        
+        <FileExplorer
+          fileSystem={fileSystem}
+          selectedFile={selectedFile}
+          expandedDirs={expandedDirs}
+          onFileSelect={handleFileSelect}
+          onToggleDirectory={toggleDirectory}
+          onCreateFile={createNewFile}
+          onCreateFolder={createNewFolder}
+        />
+
         <div 
           className="resize-handle cursor-col-resize w-1 bg-transparent hover:bg-[#0e639c]"
           onMouseDown={startResizingSidebar}
           style={{ cursor: isResizing ? 'col-resize' : 'default' }}
-        ></div>
-        
+        />
+
         <div className="editor-area">
-          {selectedFile ? renderEditor() : (
-            <div className="no-file-selected">
-              <Code size={48} className="text-[#858585] mb-4" />
-              <span>Select a file to edit</span>
-              <div className="flex mt-4 space-x-2">
-                <button className="action-btn" onClick={createNewFile}>
-                  <FilePlus size={16} className="mr-1" />
-                  New File
-                </button>
-                <button className="action-btn" onClick={createNewFolder}>
-                  <FolderPlus size={16} className="mr-1" />
-                  New Folder
-                </button>
-              </div>
-            </div>
-          )}
+          <CodeEditor
+            selectedFile={selectedFile}
+            editorContent={editorContent}
+            viewMode={viewMode}
+            aiActive={aiActive}
+            aiThinking={aiThinking}
+            aiSuggestion={aiSuggestion}
+            onEditorChange={handleEditorChange}
+            onViewModeChange={setViewMode}
+            onAcceptSuggestion={acceptSuggestion}
+          />
         </div>
-        
+
         <div className="w-[320px]">
           <Chat />
         </div>
@@ -749,66 +712,15 @@ const Index = () => {
       <div 
         className="resize-handle-horizontal cursor-row-resize h-1 bg-transparent hover:bg-[#0e639c] relative"
         onMouseDown={startResizingTerminal}
-      ></div>
-      
-      <div 
-        ref={terminalRef}
-        className={`terminal-area ${!isTerminalVisible ? 'hidden' : ''}`}
-        style={{ height: isTerminalVisible ? terminalHeight + 'px' : '0' }}
-      >
-        <div className="terminal-header">
-          <div className="flex items-center">
-            <Terminal size={16} className="mr-1" />
-            <span>Terminal</span>
-          </div>
-          <div className="terminal-actions">
-            <button 
-              className="terminal-btn" 
-              title="Clear Terminal"
-              onClick={() => setTerminalOutput(['~/project'])}
-            >
-              <X size={14} />
-            </button>
-            <button 
-              className="terminal-btn" 
-              title="Maximize Terminal"
-              onClick={() => setTerminalHeight(Math.min(500, window.innerHeight / 2))}
-            >
-              <Maximize2 size={14} />
-            </button>
-            <button 
-              className="terminal-btn" 
-              title="Hide Terminal"
-              onClick={toggleTerminal}
-            >
-              <MinusSquare size={14} />
-            </button>
-          </div>
-        </div>
-        <div className="terminal-content">
-          {terminalOutput.map((line, i) => (
-            <div key={i} className="terminal-line">
-              {line}
-            </div>
-          ))}
-          <div className="terminal-input-line">
-            <span>{'>'}</span>
-            <input 
-              type="text" 
-              className="terminal-input"
-              placeholder="Enter command..."
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  const command = e.currentTarget.value;
-                  executeCommand(command);
-                  e.currentTarget.value = '';
-                }
-              }}
-            />
-          </div>
-        </div>
-      </div>
-      
+      />
+
+      <Terminal
+        height={terminalHeight}
+        isVisible={isTerminalVisible}
+        onHeightChange={setTerminalHeight}
+        onVisibilityChange={setIsTerminalVisible}
+      />
+
       <div className="status-bar">
         <div className="flex space-x-4">
           <div className="status-item">
@@ -816,7 +728,7 @@ const Index = () => {
             <span>main</span>
           </div>
           <div className="status-item cursor-pointer" onClick={toggleTerminal}>
-            <Terminal size={14} className="mr-1" />
+            <TerminalIcon size={14} className="mr-1" />
             <span>{isTerminalVisible ? 'Hide Terminal' : 'Show Terminal'}</span>
           </div>
         </div>
@@ -825,9 +737,6 @@ const Index = () => {
             <>
               <div className="status-item">
                 {selectedFile.language || 'plain text'}
-              </div>
-              <div className="status-item">
-                <Settings size={14} />
               </div>
             </>
           )}

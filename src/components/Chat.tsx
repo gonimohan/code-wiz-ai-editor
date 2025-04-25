@@ -19,7 +19,11 @@ export const Chat = () => {
   const getAvailableProviders = () => {
     const savedKeys = localStorage.getItem('api_keys');
     if (!savedKeys) return [];
-    return JSON.parse(savedKeys).map((key: any) => key.provider);
+    const keys = JSON.parse(savedKeys);
+    return keys.map((key: any) => ({
+      provider: key.provider,
+      model: key.model
+    }));
   };
 
   const handleSendMessage = async (e: React.FormEvent) => {
@@ -49,9 +53,10 @@ export const Chat = () => {
     }
     
     setTimeout(() => {
+      const selectedProvider = providers[0];
       const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
-        content: `Using ${providers[0]} API. Based on your input, I'll help create a professional solution. Let me know if you need any clarification.`,
+        content: `Using ${selectedProvider.provider} (${selectedProvider.model}). Based on your input, I'll help create a professional solution. Let me know if you need any clarification.`,
         isUser: false,
         timestamp: new Date()
       };

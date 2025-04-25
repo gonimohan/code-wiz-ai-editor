@@ -6,23 +6,28 @@ import { useToast } from "@/hooks/use-toast";
 interface APIKey {
   id: string;
   provider: string;
+  model: string;
   key: string;
-  email: string;
 }
 
-const API_PROVIDERS = [
-  'OpenAI',
-  'Anthropic',
-  'DeepSeek',
-  'Groq',
-  'OpenRouter',
-  'Gemini',
-];
+// Expanded list of API providers and their models
+const API_PROVIDERS_AND_MODELS = {
+  'OpenAI': ['gpt-4', 'gpt-3.5-turbo'],
+  'Anthropic': ['claude-3-opus', 'claude-3-sonnet', 'claude-2.1'],
+  'DeepSeek': ['deepseek-chat', 'deepseek-coder'],
+  'Groq': ['mixtral-8x7b', 'llama2-70b'],
+  'OpenRouter': ['openchat', 'mistral-medium', 'mixtral-8x7b'],
+  'Gemini': ['gemini-pro', 'gemini-pro-vision'],
+  'Mistral': ['mistral-tiny', 'mistral-small', 'mistral-medium'],
+  'Cohere': ['command', 'command-light', 'command-nightly'],
+  'AI21': ['j2-ultra', 'j2-mid'],
+  'Together AI': ['mixtral-8x7b', 'yi-34b']
+};
 
 export const APIKeyManager = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [apiKeys, setApiKeys] = useState<APIKey[]>([]);
-  const [newKey, setNewKey] = useState({ provider: '', key: '', email: '' });
+  const [newKey, setNewKey] = useState({ provider: '', model: '', key: '' });
   const { toast } = useToast();
 
   useEffect(() => {
@@ -38,7 +43,7 @@ export const APIKeyManager = () => {
   };
 
   const addKey = () => {
-    if (!newKey.provider || !newKey.key || !newKey.email) {
+    if (!newKey.provider || !newKey.model || !newKey.key) {
       toast({
         title: "Validation Error",
         description: "Please fill in all fields",
@@ -53,11 +58,11 @@ export const APIKeyManager = () => {
 
     const updatedKeys = [...apiKeys, key];
     saveKeys(updatedKeys);
-    setNewKey({ provider: '', key: '', email: '' });
+    setNewKey({ provider: '', model: '', key: '' });
     
     toast({
       title: "API Key Added",
-      description: `${newKey.provider} API key has been added for ${newKey.email}`,
+      description: `${newKey.provider} API key has been added for ${newKey.model}`,
     });
   };
 
@@ -88,21 +93,34 @@ export const APIKeyManager = () => {
             <div className="space-y-2">
               <select
                 value={newKey.provider}
-                onChange={(e) => setNewKey({ ...newKey, provider: e.target.value })}
+                onChange={(e) => {
+                  setNewKey({ 
+                    ...newKey, 
+                    provider: e.target.value,
+                    model: '' // Reset model when provider changes
+                  });
+                }}
                 className="w-full bg-[#333333] border border-[#404040] rounded px-3 py-2 text-sm"
               >
                 <option value="">Select Provider</option>
-                {API_PROVIDERS.map(provider => (
+                {Object.keys(API_PROVIDERS_AND_MODELS).map(provider => (
                   <option key={provider} value={provider}>{provider}</option>
                 ))}
               </select>
-              <input
-                type="email"
-                placeholder="Email"
-                value={newKey.email}
-                onChange={(e) => setNewKey({ ...newKey, email: e.target.value })}
-                className="w-full bg-[#333333] border border-[#404040] rounded px-3 py-2 text-sm"
-              />
+              
+              {newKey.provider && (
+                <select
+                  value={newKey.model}
+                  onChange={(e) => setNewKey({ ...newKey, model: e.target.value })}
+                  className="w-full bg-[#333333] border border-[#404040] rounded px-3 py-2 text-sm"
+                >
+                  <option value="">Select Model</option>
+                  {API_PROVIDERS_AND_MODELS[newKey.provider as keyof typeof API_PROVIDERS_AND_MODELS].map(model => (
+                    <option key={model} value={model}>{model}</option>
+                  ))}
+                </select>
+              )}
+              
               <input
                 type="password"
                 placeholder="API Key"
@@ -127,7 +145,7 @@ export const APIKeyManager = () => {
                 <div key={key.id} className="flex items-center justify-between bg-[#333333] rounded p-2">
                   <div>
                     <div className="text-sm font-medium">{key.provider}</div>
-                    <div className="text-xs text-[#858585]">{key.email}</div>
+                    <div className="text-xs text-[#858585]">{key.model}</div>
                   </div>
                   <button
                     onClick={() => removeKey(key.id)}

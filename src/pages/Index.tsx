@@ -1,5 +1,5 @@
-
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
+import { Chat } from '@/components/Chat';
 import { 
   ChevronDown, ChevronRight, Terminal, Code, 
   Play, Save, Zap, X, Maximize2, 
@@ -9,7 +9,6 @@ import {
 } from 'lucide-react';
 import { toast } from "@/hooks/use-toast";
 
-// Simplified file system interface
 interface FileNode {
   id: string;
   name: string;
@@ -20,7 +19,6 @@ interface FileNode {
 }
 
 const Index = () => {
-  // State management
   const [fileSystem, setFileSystem] = useState<FileNode[]>([]);
   const [expandedDirs, setExpandedDirs] = useState<Set<string>>(new Set(['src']));
   const [selectedFile, setSelectedFile] = useState<FileNode | null>(null);
@@ -47,7 +45,6 @@ const Index = () => {
   const sidebarRef = useRef<HTMLDivElement>(null);
   const editorRef = useRef<HTMLTextAreaElement>(null);
 
-  // Initialize file system with sample data
   useEffect(() => {
     const initialFs: FileNode[] = [
       {
@@ -158,18 +155,15 @@ const Index = () => {
     
     setFileSystem(initialFs);
     
-    // Set App.tsx as the default selected file
     const appTsxFile = initialFs[0].children?.find(f => f.id === 'app-tsx');
     if (appTsxFile) {
       setSelectedFile(appTsxFile);
       setEditorContent(appTsxFile.content || '');
     }
 
-    // Add expandedDirs for src/components
     setExpandedDirs(prev => new Set([...prev, 'components']));
   }, []);
 
-  // Handle file selection
   const handleFileSelect = (file: FileNode) => {
     if (file.type === 'file') {
       setSelectedFile(file);
@@ -182,7 +176,6 @@ const Index = () => {
     }
   };
 
-  // Toggle directory expansion
   const toggleDirectory = (dirId: string) => {
     const newExpanded = new Set(expandedDirs);
     if (newExpanded.has(dirId)) {
@@ -193,22 +186,18 @@ const Index = () => {
     setExpandedDirs(newExpanded);
   };
 
-  // Update file content when editor changes
   const handleEditorChange = (content: string) => {
     setEditorContent(content);
     
     if (selectedFile) {
-      // Update the file system with new content
       updateFileContent(selectedFile.id, content);
     }
     
-    // When user types, potentially trigger AI suggestions
     if (aiActive && content.length > 0 && content !== selectedFile?.content) {
       generateAiSuggestion(content);
     }
   };
 
-  // Update file content in the file system
   const updateFileContent = (fileId: string, content: string) => {
     const updateNode = (nodes: FileNode[]): FileNode[] => {
       return nodes.map(node => {
@@ -227,15 +216,12 @@ const Index = () => {
     setFileSystem(updateNode(fileSystem));
   };
 
-  // Simulate AI suggestion generation
   const generateAiSuggestion = (currentCode: string) => {
     if (aiThinking) return;
     setAiThinking(true);
     
-    // Simulate AI thinking delay
     setTimeout(() => {
       if (selectedFile?.language === 'typescript' || selectedFile?.language === 'javascript') {
-        // Simplified AI suggestion for demo purposes
         const suggestions = [
           "// Add a useEffect hook to handle component lifecycle\nuseEffect(() => {\n  // Your effect logic here\n  return () => {\n    // Cleanup logic\n  };\n}, []);",
           "// Consider adding error handling\ntry {\n  // Your code here\n} catch (error) {\n  console.error('An error occurred:', error);\n}",
@@ -253,11 +239,9 @@ const Index = () => {
     }, 1500);
   };
 
-  // Handle terminal command execution (simulated)
   const executeCommand = (command: string) => {
     setTerminalOutput(prev => [...prev, `> ${command}`]);
     
-    // Simulate command execution
     setTimeout(() => {
       if (command.includes('npm install')) {
         setTerminalOutput(prev => [...prev, 'Installing dependencies...', 'Done!', '~/project']);
@@ -271,7 +255,6 @@ const Index = () => {
     }, 700);
   };
 
-  // Accept AI suggestion
   const acceptSuggestion = () => {
     if (aiSuggestion && selectedFile) {
       const newContent = editorContent + '\n\n' + aiSuggestion;
@@ -285,7 +268,6 @@ const Index = () => {
     }
   };
 
-  // Save the current file
   const saveFile = () => {
     if (selectedFile) {
       updateFileContent(selectedFile.id, editorContent);
@@ -296,7 +278,6 @@ const Index = () => {
     }
   };
 
-  // Run the code
   const runCode = () => {
     setTerminalOutput(prev => [...prev, '> npm run dev', 'Starting development server...']);
     
@@ -309,7 +290,6 @@ const Index = () => {
     }, 1500);
   };
 
-  // Handle mouse events for terminal resize
   const startResizingTerminal = (e: React.MouseEvent) => {
     e.preventDefault();
     document.addEventListener('mousemove', handleTerminalResize);
@@ -329,7 +309,6 @@ const Index = () => {
     document.removeEventListener('mouseup', stopResizingTerminal);
   };
 
-  // Handle mouse events for sidebar resize
   const startResizingSidebar = (e: React.MouseEvent) => {
     e.preventDefault();
     setIsResizing(true);
@@ -350,12 +329,10 @@ const Index = () => {
     document.removeEventListener('mouseup', stopResizingSidebar);
   };
 
-  // Toggle terminal visibility
   const toggleTerminal = () => {
     setIsTerminalVisible(!isTerminalVisible);
   };
 
-  // Toggle search functionality
   const toggleSearch = () => {
     setIsSearchActive(!isSearchActive);
     if (!isSearchActive) {
@@ -363,7 +340,6 @@ const Index = () => {
     }
   };
 
-  // Search files
   const searchFiles = (query: string): FileNode[] => {
     const results: FileNode[] = [];
     
@@ -383,7 +359,6 @@ const Index = () => {
     return results;
   };
 
-  // Get file icon based on file extension
   const getFileIcon = (filename: string) => {
     const extension = filename.split('.').pop()?.toLowerCase();
     
@@ -405,7 +380,6 @@ const Index = () => {
     }
   };
 
-  // Create new file (simplified for demo)
   const createNewFile = () => {
     const newFileName = prompt('Enter file name:');
     
@@ -437,7 +411,6 @@ const Index = () => {
     }
   };
 
-  // Create new folder (simplified for demo)
   const createNewFolder = () => {
     const newDirName = prompt('Enter folder name:');
     
@@ -460,12 +433,10 @@ const Index = () => {
     }
   };
 
-  // Apply syntax highlighting to code
   const highlightSyntax = (code: string, language?: string): JSX.Element => {
     if (!code) return <></>;
     
     if (language === 'typescript' || language === 'javascript') {
-      // Simple syntax highlighting for keywords and strings
       const keywordPattern = /\b(const|let|var|function|return|if|else|for|while|import|export|from|default|class|interface|extends|implements|new|this|async|await|try|catch|throw|typeof|instanceof|in)\b/g;
       const stringPattern = /(["'`])(.*?)(\1)/g;
       const commentPattern = /(\/\/.*$|\/\*[\s\S]*?\*\/)/gm;
@@ -485,7 +456,6 @@ const Index = () => {
     return <>{code}</>;
   };
 
-  // Render file tree recursively
   const renderFileTree = (nodes: FileNode[]) => {
     return nodes.map(node => (
       <div key={node.id} className="file-tree-item">
@@ -522,7 +492,6 @@ const Index = () => {
     ));
   };
 
-  // Render search results
   const renderSearchResults = () => {
     if (!searchQuery) return null;
     
@@ -548,7 +517,6 @@ const Index = () => {
     );
   };
 
-  // Custom editor with syntax highlighting
   const renderEditor = () => {
     return (
       <div className="editor-container h-full flex flex-col">
@@ -598,7 +566,6 @@ const Index = () => {
               className="code-input"
               spellCheck="false"
             />
-            {/* Syntax highlighting overlay */}
             <div className="syntax-highlighted">
               {highlightSyntax(editorContent, selectedFile?.language)}
             </div>
@@ -623,7 +590,6 @@ const Index = () => {
           </div>
         )}
 
-        {/* AI Suggestion Panel */}
         {aiActive && (
           <div className="ai-suggestion-panel">
             <div className="ai-header">
@@ -719,11 +685,7 @@ const Index = () => {
       )}
       
       <div className="main-content">
-        <div 
-          ref={sidebarRef}
-          className="sidebar" 
-          style={{ width: sidebarWidth + 'px' }}
-        >
+        <div className="sidebar">
           <div className="explorer-header">
             <span>EXPLORER</span>
             <div className="flex space-x-2">
@@ -777,6 +739,10 @@ const Index = () => {
               </div>
             </div>
           )}
+        </div>
+        
+        <div className="w-[320px]">
+          <Chat />
         </div>
       </div>
       
